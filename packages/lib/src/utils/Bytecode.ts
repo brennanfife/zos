@@ -31,11 +31,32 @@ export function hasUnlinkedVariables(bytecode: string): boolean {
   return getSolidityLibNames(bytecode).length > 0;
 }
 
-// Removes the last 43 bytes of the bytecode, i.e., the swarm hash that the solidity compiler appends and that
-// respects the following structure: 0xa1 0x65 'b' 'z' 'z' 'r' '0' 0x58 0x20 <32 bytes swarm hash> 0x00 0x29
-// (see https://solidity.readthedocs.io/en/v0.4.24/metadata.html#encoding-of-the-metadata-hash-in-the-bytecode)
+// Removes the swarm hash from the CBOR encoded metadata at the end of the bytecode
+// (see https://solidity.readthedocs.io/en/v0.5.9/metadata.html)
 export function tryRemoveSwarmHash(bytecode: string): string {
-  return bytecode.replace(/a165627a7a72305820[a-fA-F0-9]{64}0029$/, '');
+  // Bail on empty bytecode
+  if (!bytecode || bytecode.length <= 2) return bytecode;
+
+  // Gather length of CBOR metadata from the end of the file
+  const rawLength = bytecode.slice(bytecode.length - 4);
+  const length = parseInt(rawLength, 16);
+
+  // Bail on unreasonable values for length (meaning we read something else other than metadata length)
+  if (length > 100) return bytecode;
+
+  // Gather what we assume is the CBOR encoded metadata, and remove the swarm hash
+  const metadataStart = bytecode.length - length * 2 - 4;
+  const metadata = bytecode.slice(metadataStart, bytecode.length - 4);
+
+  const metadataWithoutSwarmHash = metadata.replace(
+    /65627a7a72305820[a-fA-F0-9]{64}/,
+    '',
+  );
+
+  // Rebuild bytecode
+  return (
+    bytecode.slice(0, metadataStart) + metadataWithoutSwarmHash + rawLength
+  );
 }
 
 // Replaces the solidity library address inside its bytecode with zeros
