@@ -18,9 +18,15 @@ function runIntegrationTest({ kit }, action) {
   before('cleaning up project folder', cleanup);
 
   it('unpack kit', function () {
-    run(`npx zos unpack ${kit}`);
+    // have to replace zos with local version so we test current build
+    run(`node ../../../packages/cli/lib/bin/zos-cli.js unpack ${kit}`);
   })
 
+  // have to replace zos with local version so we test current build
+  it('replace zos with local version', function () {
+    run('~/zos/node_modules/.bin/lerna bootstrap --scope=tests-cli-zepkit --scope="zos*"');
+  })
+  
   it('init zos project', function () {
     run(`npx zos init ${kit} 1.0.0 --no-interactive`);
   })
