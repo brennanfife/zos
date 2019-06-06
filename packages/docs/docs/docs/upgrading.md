@@ -3,7 +3,7 @@ id: upgrading
 title: Upgrading your project
 ---
 
-At the end of the [previous guide](deploying) we deployed a ZeppelinOS
+At the end of the [previous guide](deploying), we deployed a ZeppelinOS
 project with one contract. Here is the code of the contract, to keep it fresh
 on our minds:
 
@@ -24,7 +24,7 @@ contract MyContract is Initializable {
 }
 ```
 
-This is a traditional immutable contract that will remain frozen for ever on
+This is a traditional immutable contract that will remain frozen forever on
 the blockchain, with mistakes, limited functionalities and everything.
 ZeppelinOS lets us opt-in to allow upgrades on our contracts, and open the
 doors to a more sustainable process for developing our projects. With upgrades
@@ -149,7 +149,7 @@ Once in the Truffle console, execute the following instructions to try
 the new functionality we've just added:
 
 > _Make sure you replace <your-contract-address> with the address of the 
-upgradeable instance your created of `MyContract`. This address was 
+upgradeable instance you created in `MyContract`. This address was 
 returned by the `create` command we ran in the previous section, which
 is the same as the one returned by the `update` command we ran above._
 
@@ -177,7 +177,7 @@ function initialize(uint256 _x, string memory _s, uint256 _t) initializer public
 ```
 
 That would be fine for newly deployed instances of MyContract, but it wouldn't work for one that 
-has allready been deployed, and is instead being updated. We cannot call the same `initialize` function, because
+has already been deployed, and is instead being updated. We cannot call the same `initialize` function, because
 the `Initializable` modifier guards it against being called more than once. We need a new function. 
 
 The `update` command also accepts `--init` and `--args` parameters, so we can use a function
